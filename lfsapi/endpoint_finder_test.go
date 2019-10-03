@@ -550,10 +550,11 @@ type InsteadOfTestCase struct {
 
 func (c *InsteadOfTestCase) Assert(t *testing.T) {
 	finder := NewEndpointFinder(lfshttp.NewContext(nil, nil, map[string]string{
-		"remote.test.url":                      c.Given,
-		"url.https://example.com/.insteadof":   "ex:",
-		"url.ssh://example.com/.pushinsteadof": "ex:",
-		"url.ssh://example.com/.insteadof":     "exp:",
+		"remote.test.url":                       c.Given,
+		"url.https://example.com/.insteadof":    "ex:",
+		"url.ssh://example.com/.pushinsteadof":  "ex:",
+		"url.ssh://example.com/.insteadof":      "exp:",
+		"url.https+iap://example.com.insteadof": "https://example.com",
 	}))
 	actual := finder.Endpoint(c.Operation, "test")
 	assert.Equal(t, c.Expected, actual, "lfsapi: expected endpoint for %q to be %#v (was %#v)", c.Given, c.Expected, actual)
@@ -605,6 +606,17 @@ func TestInsteadOf(t *testing.T) {
 				SshPath:        "git-lfs/git-lfs.git",
 				SshPort:        "",
 				Operation:      "upload",
+			},
+		},
+		"https+iap://example.com alias": {
+			"https://example.com/git-lfs/git-lfs.git",
+			"download",
+			lfshttp.Endpoint{
+				Url:            "https://example.com/git-lfs/git-lfs.git/info/lfs",
+				SshUserAndHost: "",
+				SshPath:        "",
+				SshPort:        "",
+				Operation:      "download",
 			},
 		},
 	} {

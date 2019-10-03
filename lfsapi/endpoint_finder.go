@@ -211,6 +211,11 @@ func (e *endpointGitFinder) NewEndpoint(operation, rawurl string) lfshttp.Endpoi
 	case "":
 		return lfshttp.EndpointFromBareSshUrl(u.String())
 	default:
+		if strings.HasPrefix(u.Scheme, "https+") {
+			// Consider all "https+x" URLs as regular "https" for git-lfs case
+			u.Scheme = "https"
+			return lfshttp.EndpointFromHttpUrl(u)
+		}
 		if strings.HasPrefix(rawurl, u.Scheme+"::") {
 			// Looks like a remote helper; just pass it through.
 			return lfshttp.Endpoint{Url: rawurl}
